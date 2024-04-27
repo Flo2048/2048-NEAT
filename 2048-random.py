@@ -221,10 +221,24 @@ def run():
     plt.scatter(xvalues, scorelist, s=1, label='Score')
     plt.plot([0, len(xvalues)], [average, average], color='red', label='Average')       #line for average
     plt.plot([0, len(xvalues)], [median, median], color='green', label='Median')        #line for median
-    plt.plot([0, len(xvalues)], [statistics.stdev(scorelist), statistics.stdev(scorelist)], color='yellow', label='Standard deviation')       #line for Standard deviation
+    plt.plot([0, len(xvalues)], [average+statistics.stdev(scorelist), average+statistics.stdev(scorelist)], color='yellow', label='Standard deviation')       #line for Standard deviation
+    plt.plot([0, len(xvalues)], [average-statistics.stdev(scorelist), average-statistics.stdev(scorelist)], color='yellow')
     plt.legend(loc='best')
     plt.title('Score ')
     plt.savefig('RandomStatistic.pdf')
+    plt.show()
+
+    #Distribution
+    maxdis= scorelist.count(max(set(scorelist), key=scorelist.count))
+    plt.close()
+    plt.hist(scorelist, bins=max(scorelist))
+    plt.plot([average, average], [0, maxdis], color='red', label='Average')
+    plt.plot([median, median], [0, maxdis], color='green', label='Median')
+    plt.plot([average+statistics.stdev(scorelist), average-statistics.stdev(scorelist)], [maxdis, maxdis], color='yellow', label='Standard deviation')
+    plt.title("Random Distribution")
+    plt.legend(loc='best')
+    plt.savefig('Random distribution.pdf')
+    plt.savefig('Random distribution.png')
     plt.show()
 
 

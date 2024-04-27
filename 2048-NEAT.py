@@ -21,6 +21,7 @@ fitnessIsScore = True       #Fitness is Score/Tile
 InputScore = False          #change config!             if True: 17 inputs, if False: 16 inputs
 numbergames = 1000          #games for validation
 showstats = True            #shows+saves Stats or just saves them
+showNEATstats = False
 
 
 
@@ -263,11 +264,24 @@ def validationrun(bestgenome, config):
     plt.plot([0, len(xvalues)], [average, average], color='red', label='Average')       #line for average
     plt.plot([0, len(xvalues)], [median, median], color='green', label='Median')        #line for median
     plt.scatter(xvalues, scorelist, s=1, color='blue', label='Score')                   #Dots for Score
-    plt.plot([0, len(xvalues)], [statistics.stdev(scorelist), statistics.stdev(scorelist)], color='yellow', label='Standard deviation')       #line for Standard deviation
+    plt.plot([0, len(xvalues)], [average+statistics.stdev(scorelist), average+statistics.stdev(scorelist)], color='yellow', label='Standard deviation')       #line for Standard deviation
+    plt.plot([0, len(xvalues)], [average-statistics.stdev(scorelist), average-statistics.stdev(scorelist)], color='yellow')
     plt.legend(loc='upper left')                              #legend
     plt.title("Score during run")
     plt.savefig('Score during run.pdf')
     plt.savefig('Score during run.png')
+    if showstats==True: plt.show()
+    plt.close()
+
+    #Distribution during run
+    maxdis= scorelist.count(max(set(scorelist), key=scorelist.count))
+    plt.hist(scorelist, bins=max(scorelist))
+    plt.plot([average, average], [0, maxdis], color='red', label='Average')
+    plt.plot([median, median], [0, maxdis], color='green', label='Median')
+    plt.plot([average+statistics.stdev(scorelist), average-statistics.stdev(scorelist)], [maxdis, maxdis], color='yellow', label='Standard deviation')
+    plt.title("Distribution during run")
+    plt.savefig('Distribution during run.pdf')
+    plt.savefig('Distribution during run.png')
     if showstats==True: plt.show()
     plt.close()
     
@@ -281,11 +295,22 @@ def Stats(config, winner, stats):
     plt.savefig('Score during training.pdf')
     plt.savefig('Score during training.png')
     if showstats==True: plt.show()
+
+    
+
+    #Distribution during training
     plt.close()
+    plt.hist(yAIscore, bins=max(yAIscore))
+    plt.title("Distribution during training")
+    plt.savefig('Distribution during training.pdf')
+    plt.savefig('Distribution during training.png')
+    if showstats==True: plt.show()
+    plt.close()
+
     #visualisation stats 
-    visualize.draw_net(config, winner, showstats)
-    visualize.plot_stats(stats, ylog=False, view=showstats)
-    visualize.plot_species(stats, view=showstats)
+    visualize.draw_net(config, winner, showNEATstats)
+    visualize.plot_stats(stats, ylog=False, view=showNEATstats)
+    visualize.plot_species(stats, view=showNEATstats)
 
 
 def main(config_file):
@@ -302,7 +327,7 @@ def main(config_file):
     p.add_reporter(stats)
 
     # Run for up to 3000 generations.
-    winner = p.run(Run, 3000)
+    winner = p.run(Run, 30)
     bestgenome = stats.best_genome()
     # Display the best genome.
     print('\nGenome with the highest fitness:\n{!s}'.format(bestgenome))
